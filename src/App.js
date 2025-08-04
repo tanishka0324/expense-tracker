@@ -8,10 +8,11 @@ export default function App() {
   const [transactions, setTransactions] = useState([]);
   const [text, setText] = useState("");
   const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("Food");
 
   const addTransaction = () => {
     if (!text || !amount) return;
-    setTransactions([...transactions, { text, amount: parseFloat(amount) }]);
+    setTransactions([...transactions, { text, amount: parseFloat(amount), category }]);
     setText("");
     setAmount("");
   };
@@ -19,11 +20,11 @@ export default function App() {
   const total = transactions.reduce((acc, t) => acc + t.amount, 0);
 
   const chartData = {
-    labels: transactions.map((t) => t.text),
+    labels: transactions.map((t) => `${t.text} (${t.category})`),
     datasets: [
       {
         data: transactions.map((t) => t.amount),
-        backgroundColor: ["#4F46E5", "#22C55E", "#EF4444", "#FACC15"],
+        backgroundColor: ["#4F46E5", "#22C55E", "#EF4444", "#FACC15", "#14B8A6", "#8B5CF6"],
       },
     ],
   };
@@ -46,6 +47,15 @@ export default function App() {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
+
+        <select className="border p-2 mr-2" value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option>Food</option>
+          <option>Travel</option>
+          <option>Shopping</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+
         <button className="bg-blue-500 text-white p-2" onClick={addTransaction}>
           Add
         </button>
@@ -56,7 +66,7 @@ export default function App() {
       <ul className="mb-4">
         {transactions.map((t, i) => (
           <li key={i} className="border-b py-1">
-            {t.text} - ₹{t.amount}
+            {t.text} - ₹{t.amount} <span className="text-gray-500">({t.category})</span>
           </li>
         ))}
       </ul>
