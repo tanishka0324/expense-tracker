@@ -2,126 +2,181 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Expense Tracker UI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Expense Tracker Pro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #b88cff;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      color: #fff;
+    }
+    .sidebar {
+      width: 220px;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 10px;
+    }
+    .sidebar img {
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 10px;
+    }
+    .sidebar h3 {
+      text-align: center;
+      font-size: 16px;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #bbb;
+      padding: 10px 15px;
+      display: block;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background: #222;
+      color: #fff;
+    }
+    .main {
+      flex: 1;
+      background: #1b1b1b;
+      border-radius: 12px;
+      margin: 20px;
+      padding: 20px;
+      overflow: auto;
+    }
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+    }
+    .card {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background: #7b5bff;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn:hover { background: #956cff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table th, table td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
+      text-align: left;
+    }
+    input, select {
+      padding: 8px;
+      width: 90%;
+      margin: 5px 0;
+      border: none;
+      border-radius: 4px;
+    }
+    canvas { background: #222; border-radius: 10px; }
+  </style>
 </head>
-<body class="bg-white text-gray-900 font-sans flex justify-center p-10">
+<body>
 
-  <div class="max-w-5xl w-full">
-    <!-- Title Section -->
-    <h1 class="text-3xl font-extrabold mb-2">
-      <span class="text-purple-600">2.</span> Expense Tracker
-    </h1>
-    <p class="text-gray-400 text-lg mb-3">
-      (React, Chart.js, LocalStorage, TailwindCSS)
-    </p>
-    <p class="text-gray-500 mb-6">
-      Track income and spending, visualize with charts and filter by categories.
-    </p>
+  <div class="sidebar">
+    <img src="https://i.pravatar.cc/100" alt="Profile">
+    <h3>Janice Chandler</h3>
+    <a href="#" class="active">Home</a>
+    <a href="#">Expenses</a>
+    <a href="#">Trips</a>
+    <a href="#">Approvals</a>
+    <a href="#">Settings</a>
+    <a href="#">Support</a>
+  </div>
 
-    <!-- Card Section -->
-    <div class="bg-gradient-to-r from-purple-400 to-purple-600 p-[2px] rounded-xl shadow-xl">
-      <div class="bg-black rounded-xl relative overflow-hidden">
-        <!-- Pro Badge -->
-        <span class="absolute top-3 right-3 bg-blue-500 text-white text-sm px-3 py-1 rounded-full font-semibold shadow-md">Pro</span>
-        
-        <div class="p-6 text-gray-200 grid grid-cols-4 gap-4">
-          <!-- Sidebar -->
-          <div class="col-span-1 bg-gray-900 rounded-lg p-4 space-y-4">
-            <div class="flex items-center space-x-2">
-              <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10 border-2 border-purple-500">
-              <span>Janice Chandler</span>
-            </div>
-            <ul class="space-y-2 mt-4">
-              <li class="text-purple-400 font-semibold cursor-pointer">Home</li>
-              <li class="cursor-pointer hover:text-purple-400">Expenses</li>
-              <li class="cursor-pointer hover:text-purple-400">Trips</li>
-              <li class="cursor-pointer hover:text-purple-400">Approvals</li>
-              <li class="cursor-pointer hover:text-purple-400">Settings</li>
-              <li class="cursor-pointer hover:text-purple-400">Support</li>
-            </ul>
-            <div class="text-xs mt-6 text-purple-500 font-bold">EXPENSIO</div>
-          </div>
+  <div class="main">
+    <h2>Expense Tracker Dashboard</h2>
+    <div class="card">
+      <h3>Add New Expense</h3>
+      <input type="text" id="desc" placeholder="Description">
+      <input type="number" id="amount" placeholder="Amount">
+      <select id="category">
+        <option>Food</option>
+        <option>Travel</option>
+        <option>Shopping</option>
+        <option>Other</option>
+      </select>
+      <button class="btn" onclick="addExpense()">+ Add Expense</button>
+    </div>
 
-          <!-- Main Dashboard -->
-          <div class="col-span-3 space-y-4">
-            <!-- Quick Actions -->
-            <div class="grid grid-cols-4 gap-2">
-              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('New Expense')">+ New Expense</button>
-              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Add Receipt')">+ Add Receipt</button>
-              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Create Report')">+ Create Report</button>
-              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Create Trip')">+ Create Trip</button>
-            </div>
+    <div class="card">
+      <h3>Expenses</h3>
+      <table id="expenseTable">
+        <tr><th>Description</th><th>Amount</th><th>Category</th><th>Action</th></tr>
+      </table>
+    </div>
 
-            <!-- Charts -->
-            <div class="bg-gray-800 rounded-lg p-4">
-              <h3 class="text-lg mb-2 font-semibold">Monthly Spending Trend</h3>
-              <canvas id="spendingChart" height="100"></canvas>
-            </div>
-
-            <div class="bg-gray-800 rounded-lg p-4">
-              <h3 class="text-lg mb-2 font-semibold">Day-to-Day Expenses</h3>
-              <canvas id="dailyChart" height="100"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="card">
+      <h3>Spending Overview</h3>
+      <canvas id="expenseChart" height="100"></canvas>
     </div>
   </div>
 
-  <!-- Popup Modal -->
-  <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg w-80 text-center">
-      <h2 id="popupTitle" class="text-xl font-bold mb-4 text-black"></h2>
-      <p class="text-gray-600 mb-4">This is a demo popup. You can add real forms here.</p>
-      <button onclick="closePopup()" class="bg-purple-600 text-white px-4 py-2 rounded">Close</button>
-    </div>
-  </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Chart.js - Monthly Spending Chart
-  const ctx1 = document.getElementById('spendingChart').getContext('2d');
-  new Chart(ctx1, {
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  const ctx = document.getElementById('expenseChart').getContext('2d');
+  const expenseChart = new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Expenses (€)',
-        data: [300, 250, 400, 350, 500, 450],
-        backgroundColor: '#9333ea'
-      }]
-    },
-    options: { plugins: { legend: { display: false } } }
+    data: { labels: [], datasets: [{ label: 'Expenses', data: [], backgroundColor: ['#7b5bff','#ff5b5b','#5bc0de','#5bff5b'] }] },
+    options: { plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#fff'}}, y: { ticks: { color: '#fff'}}}}
   });
 
-  // Chart.js - Daily Expenses Chart
-  const ctx2 = document.getElementById('dailyChart').getContext('2d');
-  new Chart(ctx2, {
-    type: 'line',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [{
-        label: 'Daily Expenses',
-        data: [50, 70, 30, 90, 40, 100, 60],
-        borderColor: '#7c3aed',
-        backgroundColor: '#a78bfa',
-        tension: 0.3,
-        fill: true
-      }]
-    },
-    options: { plugins: { legend: { display: false } } }
-  });
+  function updateChart() {
+    const catTotals = {};
+    expenses.forEach(e => catTotals[e.category] = (catTotals[e.category] || 0) + parseFloat(e.amount));
+    expenseChart.data.labels = Object.keys(catTotals);
+    expenseChart.data.datasets[0].data = Object.values(catTotals);
+    expenseChart.update();
+  }
 
-  // Popup functions
-  function showPopup(action) {
-    document.getElementById('popupTitle').innerText = action;
-    document.getElementById('popup').classList.remove('hidden');
+  function renderTable() {
+    const table = document.getElementById('expenseTable');
+    table.innerHTML = '<tr><th>Description</th><th>Amount</th><th>Category</th><th>Action</th></tr>';
+    expenses.forEach((e, i) => {
+      table.innerHTML += `<tr><td>${e.desc}</td><td>€${e.amount}</td><td>${e.category}</td>
+      <td><button class="btn" onclick="deleteExpense(${i})">Delete</button></td></tr>`;
+    });
+    updateChart();
   }
-  function closePopup() {
-    document.getElementById('popup').classList.add('hidden');
+
+  function addExpense() {
+    const desc = document.getElementById('desc').value;
+    const amount = document.getElementById('amount').value;
+    const category = document.getElementById('category').value;
+    if(desc && amount) {
+      expenses.push({desc, amount, category});
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      renderTable();
+      document.getElementById('desc').value='';
+      document.getElementById('amount').value='';
+    }
   }
+
+  function deleteExpense(i) {
+    expenses.splice(i,1);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+    renderTable();
+  }
+
+  renderTable();
 </script>
 
 </body>
