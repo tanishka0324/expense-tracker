@@ -1,181 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Advanced Expense Tracker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; transition: 0.3s; }
-    .dark { background: #121212; color: #ddd; }
-    .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .dark .container { background: #1e1e1e; }
-    h2, h3 { text-align: center; }
-    .btn { padding: 8px 15px; border: none; cursor: pointer; border-radius: 5px; }
-    .btn-dark { background: #333; color: #fff; }
-    .btn-light { background: #f1f1f1; color: #333; }
-    input, select { padding: 6px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-    ul { list-style: none; padding: 0; }
-    li { padding: 6px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
-    .chart-container { margin-top: 20px; background: #fafafa; padding: 10px; border-radius: 10px; }
-    .dark .chart-container { background: #2a2a2a; }
-    .actions button { margin-left: 5px; }
-    .summary { font-weight: bold; margin: 10px 0; text-align: center; }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <h2>💰 Advanced Expense Tracker</h2>
-    <button id="toggleDark" class="btn btn-light">🌙 Dark Mode</button>
-    
-    <div>
-      <input type="text" id="name" placeholder="Name" />
-      <input type="number" id="amount" placeholder="₹ Amount" />
-      <input type="date" id="date" />
-      <select id="category">
-        <option>Food</option>
-        <option>Travel</option>
-        <option>Shopping</option>
-        <option>Entertainment</option>
-        <option>Other</option>
-      </select>
-      <button id="addBtn" class="btn btn-dark">Add</button>
+<body class="bg-white text-gray-900 font-sans flex justify-center p-10">
+
+  <div class="max-w-5xl w-full">
+    <!-- Title Section -->
+    <h1 class="text-3xl font-extrabold mb-2">
+      <span class="text-purple-600">2.</span> Expense Tracker
+    </h1>
+    <p class="text-gray-400 text-lg mb-3">
+      (React, Chart.js, LocalStorage, TailwindCSS)
+    </p>
+    <p class="text-gray-500 mb-6">
+      Track income and spending, visualize with charts and filter by categories.
+    </p>
+
+    <!-- Card Section -->
+    <div class="bg-gradient-to-r from-purple-400 to-purple-600 p-[2px] rounded-xl shadow-xl">
+      <div class="bg-black rounded-xl relative overflow-hidden">
+        <!-- Pro Badge -->
+        <span class="absolute top-3 right-3 bg-blue-500 text-white text-sm px-3 py-1 rounded-full font-semibold shadow-md">Pro</span>
+        
+        <div class="p-6 text-gray-200 grid grid-cols-4 gap-4">
+          <!-- Sidebar -->
+          <div class="col-span-1 bg-gray-900 rounded-lg p-4 space-y-4">
+            <div class="flex items-center space-x-2">
+              <img src="https://i.pravatar.cc/40" class="rounded-full w-10 h-10 border-2 border-purple-500">
+              <span>Janice Chandler</span>
+            </div>
+            <ul class="space-y-2 mt-4">
+              <li class="text-purple-400 font-semibold cursor-pointer">Home</li>
+              <li class="cursor-pointer hover:text-purple-400">Expenses</li>
+              <li class="cursor-pointer hover:text-purple-400">Trips</li>
+              <li class="cursor-pointer hover:text-purple-400">Approvals</li>
+              <li class="cursor-pointer hover:text-purple-400">Settings</li>
+              <li class="cursor-pointer hover:text-purple-400">Support</li>
+            </ul>
+            <div class="text-xs mt-6 text-purple-500 font-bold">EXPENSIO</div>
+          </div>
+
+          <!-- Main Dashboard -->
+          <div class="col-span-3 space-y-4">
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-4 gap-2">
+              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('New Expense')">+ New Expense</button>
+              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Add Receipt')">+ Add Receipt</button>
+              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Create Report')">+ Create Report</button>
+              <button class="bg-purple-700 hover:bg-purple-800 rounded-lg py-2" onclick="showPopup('Create Trip')">+ Create Trip</button>
+            </div>
+
+            <!-- Charts -->
+            <div class="bg-gray-800 rounded-lg p-4">
+              <h3 class="text-lg mb-2 font-semibold">Monthly Spending Trend</h3>
+              <canvas id="spendingChart" height="100"></canvas>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-4">
+              <h3 class="text-lg mb-2 font-semibold">Day-to-Day Expenses</h3>
+              <canvas id="dailyChart" height="100"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div>
-      <label>Filter by Month:</label>
-      <select id="monthFilter">
-        <option value="all">All</option>
-      </select>
-    </div>
-
-    <div class="summary">Total Expense: ₹<span id="totalExpense">0</span></div>
-
-    <h3>Transactions</h3>
-    <ul id="transactionList"></ul>
-
-    <div class="chart-container">
-      <canvas id="expenseChart"></canvas>
+  <!-- Popup Modal -->
+  <div id="popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg w-80 text-center">
+      <h2 id="popupTitle" class="text-xl font-bold mb-4 text-black"></h2>
+      <p class="text-gray-600 mb-4">This is a demo popup. You can add real forms here.</p>
+      <button onclick="closePopup()" class="bg-purple-600 text-white px-4 py-2 rounded">Close</button>
     </div>
   </div>
 
 <script>
-  const nameInput = document.getElementById("name");
-  const amountInput = document.getElementById("amount");
-  const dateInput = document.getElementById("date");
-  const categoryInput = document.getElementById("category");
-  const addBtn = document.getElementById("addBtn");
-  const transactionList = document.getElementById("transactionList");
-  const monthFilter = document.getElementById("monthFilter");
-  const totalExpenseEl = document.getElementById("totalExpense");
-
-  let transactions = JSON.parse(localStorage.getItem("expenses")) || [];
-  let editingIndex = null;
-
-  // Initialize Chart.js
-  const ctx = document.getElementById("expenseChart").getContext("2d");
-  let chart = new Chart(ctx, {
-    type: "pie",
-    data: { labels: [], datasets: [{ data: [], backgroundColor: ["#A3C4F3","#F7D9C4","#C1E1C1","#E5D4ED","#F8E1F4","#FEC5BB"] }] }
+  // Chart.js - Monthly Spending Chart
+  const ctx1 = document.getElementById('spendingChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Expenses (€)',
+        data: [300, 250, 400, 350, 500, 450],
+        backgroundColor: '#9333ea'
+      }]
+    },
+    options: { plugins: { legend: { display: false } } }
   });
 
-  function saveData() {
-    localStorage.setItem("expenses", JSON.stringify(transactions));
-  }
-
-  function updateMonthFilter() {
-    const months = new Set(transactions.map(t => t.date.slice(0,7)));
-    monthFilter.innerHTML = `<option value="all">All</option>`;
-    months.forEach(m => {
-      const option = document.createElement("option");
-      option.value = m;
-      option.textContent = m;
-      monthFilter.appendChild(option);
-    });
-  }
-
-  function calculateTotal(filtered) {
-    const total = filtered.reduce((sum, t) => sum + t.amount, 0);
-    totalExpenseEl.textContent = total.toFixed(2);
-  }
-
-  function renderTransactions() {
-    const filterMonth = monthFilter.value;
-    const filtered = filterMonth === "all" ? transactions : transactions.filter(t => t.date.startsWith(filterMonth));
-    
-    transactionList.innerHTML = "";
-    filtered.forEach((t, i) => {
-      const li = document.createElement("li");
-      li.innerHTML = `${t.name} - ₹${t.amount} (${t.category}, ${t.date})
-        <span class="actions">
-          <button onclick="editTransaction(${i})">✏️</button>
-          <button onclick="deleteTransaction(${i})">❌</button>
-        </span>`;
-      transactionList.appendChild(li);
-    });
-    calculateTotal(filtered);
-    updateChart(filtered);
-  }
-
-  function updateChart(data) {
-    const categoryTotals = {};
-    data.forEach(t => categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount);
-    chart.data.labels = Object.keys(categoryTotals);
-    chart.data.datasets[0].data = Object.values(categoryTotals);
-    chart.update();
-  }
-
-  addBtn.addEventListener("click", () => {
-    const name = nameInput.value.trim();
-    const amount = parseFloat(amountInput.value);
-    const date = dateInput.value;
-    const category = categoryInput.value;
-
-    if (!name || !amount || !date) return alert("Fill all fields!");
-
-    const newTransaction = { name, amount, date, category };
-
-    if (editingIndex !== null) {
-      transactions[editingIndex] = newTransaction;
-      editingIndex = null;
-      addBtn.textContent = "Add";
-    } else {
-      transactions.push(newTransaction);
-    }
-
-    saveData();
-    updateMonthFilter();
-    renderTransactions();
-
-    nameInput.value = amountInput.value = dateInput.value = "";
+  // Chart.js - Daily Expenses Chart
+  const ctx2 = document.getElementById('dailyChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Daily Expenses',
+        data: [50, 70, 30, 90, 40, 100, 60],
+        borderColor: '#7c3aed',
+        backgroundColor: '#a78bfa',
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: { plugins: { legend: { display: false } } }
   });
 
-  function editTransaction(i) {
-    const t = transactions[i];
-    nameInput.value = t.name;
-    amountInput.value = t.amount;
-    dateInput.value = t.date;
-    categoryInput.value = t.category;
-    editingIndex = i;
-    addBtn.textContent = "Update";
+  // Popup functions
+  function showPopup(action) {
+    document.getElementById('popupTitle').innerText = action;
+    document.getElementById('popup').classList.remove('hidden');
   }
-
-  function deleteTransaction(i) {
-    transactions.splice(i, 1);
-    saveData();
-    updateMonthFilter();
-    renderTransactions();
+  function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
   }
-
-  document.getElementById("toggleDark").addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-  });
-
-  monthFilter.addEventListener("change", renderTransactions);
-
-  // Initialize
-  updateMonthFilter();
-  renderTransactions();
 </script>
+
 </body>
 </html>
