@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Expense Tracker Pulse - Login</title>
+  <title>Expense Tracker - Login & Register</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -15,20 +15,20 @@
       color: #fff;
     }
 
-    .login-container {
+    .auth-container {
       background: rgba(0,0,0,0.6);
       padding: 30px;
       border-radius: 12px;
-      width: 300px;
+      width: 320px;
       text-align: center;
     }
 
-    .login-container h2 { margin-bottom: 20px; }
+    h2 { margin-bottom: 20px; }
 
-    .login-container input {
+    input {
       width: 90%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: none;
       border-radius: 6px;
     }
@@ -41,10 +41,19 @@
       border-radius: 6px;
       cursor: pointer;
       width: 100%;
+      margin-top: 10px;
     }
     .btn:hover { background: #956cff; }
 
-    /* Dashboard styles */
+    .toggle-link {
+      color: #ffea00;
+      cursor: pointer;
+      text-decoration: underline;
+      display: block;
+      margin-top: 10px;
+    }
+
+    /* Dashboard */
     #dashboard {
       display: none;
       width: 100%;
@@ -90,19 +99,19 @@
 
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 10px; border-bottom: 1px solid #444; }
-    input, select { padding: 8px; width: 90%; margin: 5px 0; border: none; border-radius: 4px; }
     canvas { background: #222; border-radius: 10px; }
   </style>
 </head>
 <body>
 
-  <!-- Login Screen -->
-  <div id="loginScreen" class="login-container">
-    <h2>Login to Expense Tracker</h2>
+  <!-- Auth Forms -->
+  <div id="authBox" class="auth-container">
+    <h2 id="formTitle">Login to Expense Tracker</h2>
     <input type="text" id="username" placeholder="Username">
     <input type="password" id="password" placeholder="Password">
-    <button class="btn" onclick="login()">Login</button>
+    <button class="btn" onclick="handleAuth()">Login</button>
     <p id="error" style="color: red;"></p>
+    <span class="toggle-link" onclick="toggleForm()">Don't have an account? Register</span>
   </div>
 
   <!-- Dashboard -->
@@ -148,32 +157,61 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // --- LOGIN SYSTEM ---
-  function login() {
+  let isLogin = true; // toggle state
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+
+  function toggleForm() {
+    isLogin = !isLogin;
+    document.getElementById('formTitle').textContent = isLogin ? "Login to Expense Tracker" : "Register New Account";
+    document.querySelector('.btn').textContent = isLogin ? "Login" : "Register";
+    document.querySelector('.toggle-link').textContent = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
+    document.getElementById('error').textContent = "";
+  }
+
+  function handleAuth() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
 
-    if (user === "admin" && pass === "1234") {
-      document.getElementById('loginScreen').style.display = "none";
-      document.getElementById('dashboard').style.display = "flex";
-      localStorage.setItem("loggedIn", "true");
+    if (!user || !pass) {
+      document.getElementById('error').textContent = "Please fill all fields!";
+      return;
+    }
+
+    if (isLogin) {
+      // LOGIN
+      const found = users.find(u => u.username === user && u.password === pass);
+      if (found) {
+        localStorage.setItem("loggedInUser", user);
+        showDashboard();
+      } else {
+        document.getElementById('error').textContent = "Invalid username or password!";
+      }
     } else {
-      document.getElementById('error').textContent = "Invalid credentials!";
+      // REGISTER
+      if (users.some(u => u.username === user)) {
+        document.getElementById('error').textContent = "Username already exists!";
+        return;
+      }
+      users.push({ username: user, password: pass });
+      localStorage.setItem('users', JSON.stringify(users));
+      alert("Account created! You can now log in.");
+      toggleForm();
     }
   }
 
-  function logout() {
-    localStorage.removeItem("loggedIn");
-    location.reload();
-  }
-
-  // Auto login check
-  if(localStorage.getItem("loggedIn") === "true") {
-    document.getElementById('loginScreen').style.display = "none";
+  function showDashboard() {
+    document.getElementById('authBox').style.display = "none";
     document.getElementById('dashboard').style.display = "flex";
   }
 
-  // --- EXPENSE TRACKER LOGIC ---
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    location.reload();
+  }
+
+  if (localStorage.getItem("loggedInUser")) showDashboard();
+
+  // --- EXPENSE TRACKER ---
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
   const ctx = document.getElementById('expenseChart').getContext('2d');
   const expenseChart = new Chart(ctx, {
